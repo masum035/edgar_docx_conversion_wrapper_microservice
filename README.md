@@ -1,0 +1,1 @@
+﻿## Standard Template for Spring Boot Application

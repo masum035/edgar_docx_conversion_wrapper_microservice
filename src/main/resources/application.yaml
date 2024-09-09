@@ -1,0 +1,13 @@
+﻿spring:
+  main:
+    banner-mode: off
+  application:
+    name: edgardocs-wrapper
+  profiles:
+    active: dev
+    default: dev
+  security:
+    user:
+      name: masum
+      password: masum
+#  1203dddb-6427-4c47-af4b-1dc6085dcb6b

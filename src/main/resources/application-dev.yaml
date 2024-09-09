@@ -1,0 +1,32 @@
+﻿server:
+  port: 8082
+#  servlet:
+#    context-path: /masum 
+
+# for swagger      
+springdoc:
+  swagger-ui:
+    path: swagger-ui.html
+    
+spring:
+  data:
+    mongodb:
+      uri: mongodb+srv://masum-wsd:masum-wsd-db-password@mongo-cluster-of-masum.ba9aw.mongodb.net/
+      database: journalDB
+      auto-index-creation: true
+  main:
+    allow-circular-references: true
+    
+# for actuator
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,env,metrics,beans,loggers
+
+# for logging
+logging:
+  level:
+    root: warn
+    console:
+      level: WARN
