@@ -1,6 +1,8 @@
 package com.wsd.edgardocswrapper.serviceImplementors;
 
 import com.wsd.edgardocswrapper.services.IDocxPreprocessingService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.MultipartBodyBuilder;
@@ -16,6 +18,7 @@ import java.nio.file.Paths;
 
 @Service
 public class DocxPreprocessingServiceImpl implements IDocxPreprocessingService {
+    private static final Logger logger = LoggerFactory.getLogger(DocxPreprocessingServiceImpl.class);
     private final WebClient webClient;
     private final String docxPreprocessingApiUrl = "http://localhost:5000/api/v1/http/apply-all-conversion";
 
@@ -29,8 +32,8 @@ public class DocxPreprocessingServiceImpl implements IDocxPreprocessingService {
         try {
             // Verify and log the content type of the file before sending
             String mimeType = file.getContentType();
-            System.out.println("MIME Type: " + mimeType);
-            System.out.println("File name: " + file.getOriginalFilename());
+            logger.info("MIME Type: " + mimeType);
+            logger.info("File name: " + file.getOriginalFilename());
 
             // Create a MultipartBodyBuilder to prepare the file upload
             MultipartBodyBuilder bodyBuilder = new MultipartBodyBuilder();
@@ -53,7 +56,7 @@ public class DocxPreprocessingServiceImpl implements IDocxPreprocessingService {
                     .doOnError(throwable -> System.err.println("Error uploading and downloading file: " + throwable.getMessage()))
                     .subscribe();
         } catch (IOException e) {
-            System.err.println("Error preparing file for upload: " + e.getMessage());
+            logger.info("Error preparing file for upload: " + e.getMessage());
         }
     }
 
@@ -63,9 +66,9 @@ public class DocxPreprocessingServiceImpl implements IDocxPreprocessingService {
         try (FileOutputStream fos = new FileOutputStream(file)) {
             // Save the file content
             FileCopyUtils.copy(fileContent, fos);
-            System.out.println("File saved successfully: " + file.getAbsolutePath());
+            logger.info("File saved successfully: " + file.getAbsolutePath());
         } catch (IOException e) {
-            System.err.println("Error saving file: " + e.getMessage());
+            logger.info("Error saving file: " + e.getMessage());
         }
     }
 }

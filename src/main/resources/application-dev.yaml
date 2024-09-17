@@ -1,5 +1,5 @@
 ﻿server:
-  port: 7001
+  port: 8080
   tomcat:
     max-connections: 2000
     accept-count: 200
@@ -25,11 +25,13 @@ management:
   endpoint:
     health:
       show-details: always
+    metrics:
+      enabled: true
   endpoints:
     web:
       base-path: /actuator
       exposure:
-        include: health,env,metrics,beans,loggers,info
+        include: health,prometheus # health,env,metrics,beans,loggers,info 
 
 # for logging
 logging:

@@ -58,6 +58,13 @@
             <artifactId>logstash-logback-encoder</artifactId>
             <version>7.4</version>
         </dependency>
+        <!-- for prometheous -->
+        <dependency>
+            <groupId>io.micrometer</groupId>
+            <artifactId>micrometer-registry-prometheus</artifactId>
+            <version>1.13.4</version>
+        </dependency>
+
         <!-- Elasticsearch Client 
         <dependency>
             <groupId>org.elasticsearch.client</groupId>
