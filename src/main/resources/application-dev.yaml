@@ -1,5 +1,8 @@
 ﻿server:
-  port: 8082
+  port: 7001
+  tomcat:
+    max-connections: 2000
+    accept-count: 200
 #  servlet:
 #    context-path: /masum 
 
@@ -19,10 +22,14 @@ spring:
     
 # for actuator
 management:
+  endpoint:
+    health:
+      show-details: always
   endpoints:
     web:
+      base-path: /actuator
       exposure:
-        include: health,env,metrics,beans,loggers
+        include: health,env,metrics,beans,loggers,info
 
 # for logging
 logging:

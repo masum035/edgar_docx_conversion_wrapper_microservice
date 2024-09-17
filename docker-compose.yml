@@ -1,0 +1,59 @@
+﻿services:
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.17.23
+    container_name: elasticsearch
+    environment:
+      - node.name=elasticsearch
+      - discovery.type=single-node
+      - cluster.name=docker-cluster
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms1g -Xmx1g"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    ports:
+      - "9200:9200"
+    volumes:
+      - es_data:/usr/share/elasticsearch/data
+    networks:
+      - efk
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:7.17.23
+    container_name: kibana
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+    ports:
+      - "5601:5601"
+    depends_on:
+      - elasticsearch
+    networks:
+      - efk
+
+  fluentd:
+    image: fluent/fluentd:v1.17.1-debian-1.0
+    container_name: fluentd
+    environment:
+      - FLUENT_ELASTICSEARCH_HOST=elasticsearch
+      - FLUENT_ELASTICSEARCH_PORT=9200
+    ports:
+      - "24224:24224"
+      - "24224:24224/udp"
+    volumes:
+      - ./fluentd/fluent.conf:/fluentd/etc/fluent.conf
+      - fluentd_buffer:/fluentd/buffer
+    networks:
+      - efk
+    user: root
+    command: /bin/sh -c "gem install fluent-plugin-elasticsearch --no-document && chown -R fluent /fluentd && su fluent -c 'fluentd -c /fluentd/etc/fluent.conf'"
+
+networks:
+  efk:
+    driver: bridge
+
+volumes:
+  es_data:
+    driver: local
+  fluentd_buffer:
+    driver: local
