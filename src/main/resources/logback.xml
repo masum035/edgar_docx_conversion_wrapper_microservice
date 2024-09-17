@@ -3,8 +3,10 @@
     <!-- Define properties -->
     <property name="LOG_DIR" value="logs"/>
     <property name="LOGSTASH_HOST" value="localhost"/>
+    <property name="FLUENTD_HOST" value="localhost"/>
     <property name="LOGSTASH_PORT" value="5044"/>
-    <property name="ELASTICSEARCH_URL" value="http://localhost:9200/_bulk"/>
+    <property name="FLUENTD_PORT" value="24224"/>
+    <property name="ELASTICSEARCH_URL_WITH_INDEX" value="http://localhost:9200/_bulk"/>
 
     <!-- Console Appender -->
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
@@ -25,6 +27,12 @@
                 <threadName>
                     <fieldName>thread</fieldName>
                 </threadName>
+                <mdc>
+                    <fieldNames>
+                        <correlation_id>correlation_id</correlation_id>
+                    </fieldNames>
+                    <keys>correlation_id</keys>
+                </mdc>
                 <callerData>
                     <classFieldName>class</classFieldName>
                     <methodFieldName>method</methodFieldName>
@@ -60,6 +68,12 @@
                 <threadName>
                     <fieldName>thread</fieldName>
                 </threadName>
+                <mdc>
+                    <fieldNames>
+                        <correlation_id>correlation_id</correlation_id>
+                    </fieldNames>
+                    <keys>correlation_id</keys>
+                </mdc>
                 <callerData>
                     <classFieldName>class</classFieldName>
                     <methodFieldName>method</methodFieldName>
@@ -89,6 +103,12 @@
                 <threadName>
                     <fieldName>thread</fieldName>
                 </threadName>
+                <mdc>
+                    <fieldNames>
+                        <correlation_id>correlation_id</correlation_id>
+                    </fieldNames>
+                    <keys>correlation_id</keys>
+                </mdc>
                 <callerData>
                     <classFieldName>class</classFieldName>
                     <methodFieldName>method</methodFieldName>
@@ -98,9 +118,10 @@
         </encoder>
     </appender>
 
-    <!-- Elasticsearch Appender -->
-    <appender name="ELASTIC" class="net.logstash.logback.appender.HttpAppender">
-        <url>${ELASTICSEARCH_URL}</url>
+    <!-- Fluentd Appender -->
+    <appender name="FLUENTD" class="ch.qos.logback.classic.net.SocketAppender">
+        <remoteHost>${FLUENTD_HOST}</remoteHost>
+        <port>${FLUENTD_PORT}</port>
         <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
             <providers>
                 <timestamp>
@@ -118,6 +139,47 @@
                 <threadName>
                     <fieldName>thread</fieldName>
                 </threadName>
+                <mdc>
+                    <fieldNames>
+                        <correlation_id>correlation_id</correlation_id>
+                    </fieldNames>
+                    <keys>correlation_id</keys>
+                </mdc>
+                <callerData>
+                    <classFieldName>class</classFieldName>
+                    <methodFieldName>method</methodFieldName>
+                    <lineFieldName>line</lineFieldName>
+                </callerData>
+            </providers>
+        </encoder>
+    </appender>
+    
+    <!-- Elasticsearch Appender -->
+    <appender name="ELASTIC" class="net.logstash.logback.appender.HttpAppender">
+        <url>${ELASTICSEARCH_URL_WITH_INDEX}</url>
+        <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+            <providers>
+                <timestamp>
+                    <fieldName>timestamp</fieldName>
+                </timestamp>
+                <logLevel>
+                    <fieldName>level</fieldName>
+                </logLevel>
+                <loggerName>
+                    <fieldName>logger</fieldName>
+                </loggerName>
+                <message>
+                    <fieldName>message</fieldName>
+                </message>
+                <threadName>
+                    <fieldName>thread</fieldName>
+                </threadName>
+                <mdc>
+                    <fieldNames>
+                        <correlation_id>correlation_id</correlation_id>
+                    </fieldNames>
+                    <keys>correlation_id</keys>
+                </mdc>
                 <callerData>
                     <classFieldName>class</classFieldName>
                     <methodFieldName>method</methodFieldName>
@@ -133,7 +195,8 @@
     <root level="WARN">
         <appender-ref ref="CONSOLE"/>
         <appender-ref ref="FILE"/>
-<!--        <appender-ref ref="LOGSTASH"/>-->
+        <!--        <appender-ref ref="LOGSTASH"/>-->
+        <appender-ref ref="FLUENTD"/>
 <!--        <appender-ref ref="ELASTIC"/>-->
     </root>
 </configuration>
