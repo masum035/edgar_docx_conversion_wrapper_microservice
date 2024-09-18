@@ -31,30 +31,13 @@
     networks:
       - efk
 
-#  fluentd:
-#    image: fluent/fluentd:v1.17.1-debian-1.0
-#    container_name: fluentd
-#    environment:
-#      - FLUENT_ELASTICSEARCH_HOST=elasticsearch
-#      - FLUENT_ELASTICSEARCH_PORT=9200
-#    ports:
-#      - "24224:24224"
-#      - "24224:24224/udp"
-#    volumes:
-#      - ./fluentd/fluent.conf:/fluentd/etc/fluent.conf
-#      - fluentd_buffer:/fluentd/buffer
-#    networks:
-#      - efk
-#    user: root
-#    command: /bin/sh -c "gem install fluent-plugin-elasticsearch --no-document && chown -R fluent /fluentd && su fluent -c 'fluentd -c /fluentd/etc/fluent.conf'"
-  
   prometheus:
     image: prom/prometheus:latest
     container_name: prometheus
     ports:
       - "9090:9090"
     volumes:
-      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./monitoring/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
 
   grafana:
     image: grafana/grafana:latest
@@ -63,7 +46,7 @@
       - "3000:3000"
     restart: unless-stopped
     volumes:
-      - ./grafana/provisioning/datasources:/etc/grafana/provisioning/datasources
+      - ./monitoring/grafana/provisioning/datasources:/etc/grafana/provisioning/datasources
   
   zipkin:
     image: ghcr.io/openzipkin/zipkin-slim:latest
@@ -72,13 +55,29 @@
       - STORAGE_TYPE=mem
     ports:
       - "9411:9411"
-    
+  
+  minio:
+    image: docker.io/bitnami/minio:latest
+    container_name: minio
+    ports:
+      - '9000:9000'
+      - '9001:9001'
+    networks:
+      - minionetwork
+    volumes:
+      - 'minio_data:/data'
+    environment:
+      - MINIO_ROOT_USER=admin
+      - MINIO_ROOT_PASSWORD=password
+      
 networks:
   efk:
+    driver: bridge
+  minionetwork:
     driver: bridge
 
 volumes:
   es_data:
     driver: local
-  fluentd_buffer:
+  minio_data:
     driver: local

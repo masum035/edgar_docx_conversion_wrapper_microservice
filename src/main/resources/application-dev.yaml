@@ -37,7 +37,15 @@ management:
       base-path: /actuator
       exposure:
         include: health,prometheus,env,metrics,beans,loggers,info 
-
+# for object storage
+minio:
+  url: http://localhost:9000
+  access:
+    key: nw3xUC6zDrPtCGojNZ2J
+  secret:
+    key: 1HVXPTqPurYSoWcIyWyU91dNKbiNo04tHtiDgIR2
+  bucket:
+    name: edgar-bucket
 # for logging
 logging:
   level:
