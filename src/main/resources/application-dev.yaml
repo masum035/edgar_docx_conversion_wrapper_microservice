@@ -12,6 +12,8 @@ springdoc:
     path: swagger-ui.html
     
 spring:
+  zipkin:
+    base-url: http://localhost:9411/
   data:
     mongodb:
       uri: mongodb+srv://masum-wsd:masum-wsd-db-password@mongo-cluster-of-masum.ba9aw.mongodb.net/
@@ -22,6 +24,9 @@ spring:
     
 # for actuator
 management:
+  tracing:
+    sampling:
+      probability: 1.0
   endpoint:
     health:
       show-details: always
@@ -31,7 +36,7 @@ management:
     web:
       base-path: /actuator
       exposure:
-        include: health,prometheus # health,env,metrics,beans,loggers,info 
+        include: health,prometheus,env,metrics,beans,loggers,info 
 
 # for logging
 logging:
