@@ -17,8 +17,16 @@
     <licenses>
         <license/>
     </licenses>
+    <organization>
+        <name>WSD-EDGAR</name>
+        <url>https://wsd.com/</url>
+    </organization>
     <developers>
-        <developer/>
+        <developer>
+            <id>Masum</id>
+            <name>Abdullah Al Masum</name>
+            <email>abdullahmasum6035@gmail.com</email>
+        </developer>
     </developers>
     <scm>
         <connection/>
@@ -34,6 +42,14 @@
         <maven.compiler.target>17</maven.compiler.target>
         <docker-image-name>edgardocs-wrapper</docker-image-name>
         <docker-image-tag>latest</docker-image-tag>
+
+        <minio.version>8.5.12</minio.version>
+        <springdoc.version>2.6.0</springdoc.version>
+        <logstash-logback-encoder.version>7.4</logstash-logback-encoder.version>
+        <loki-logback-appender.version>1.5.1</loki-logback-appender.version>
+        <elastic-apm-agent.version>1.51.0</elastic-apm-agent.version>
+        <micrometer-prometheus.version>1.13.4</micrometer-prometheus.version>
+        <ulid-creator.version>5.2.3</ulid-creator.version>
     </properties>
     <dependencies>
         <dependency>
@@ -56,13 +72,13 @@
         <dependency>
             <groupId>net.logstash.logback</groupId>
             <artifactId>logstash-logback-encoder</artifactId>
-            <version>7.4</version>
+            <version>${logstash-logback-encoder.version}</version>
         </dependency>
-        <!-- for prometheous -->
+        <!-- for prometheus -->
         <dependency>
             <groupId>io.micrometer</groupId>
             <artifactId>micrometer-registry-prometheus</artifactId>
-            <version>1.13.4</version>
+            <version>${micrometer-prometheus.version}</version>
         </dependency>
         <!-- for distributed tracing -->
         <dependency>
@@ -77,7 +93,7 @@
         <dependency>
             <groupId>io.minio</groupId>
             <artifactId>minio</artifactId>
-            <version>8.5.12</version>
+            <version>${minio.version}</version>
         </dependency>
 
         <!-- Elasticsearch Client 
@@ -91,13 +107,19 @@
         <dependency>
             <groupId>co.elastic.apm</groupId>
             <artifactId>elastic-apm-agent</artifactId>
-            <version>1.51.0</version>
+            <version>${elastic-apm-agent.version}</version>
+        </dependency>
+        <!-- for log visualization in Grafana -->
+        <dependency>
+            <groupId>com.github.loki4j</groupId>
+            <artifactId>loki-logback-appender</artifactId>
+            <version>${loki-logback-appender.version}</version>
         </dependency>
         <!-- for swagger -->
         <dependency>
             <groupId>org.springdoc</groupId>
             <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
-            <version>2.6.0</version>
+            <version>${springdoc.version}</version>
         </dependency>
         <!-- for lombock -->
         <dependency>
@@ -128,7 +150,7 @@
         <dependency>
             <groupId>com.github.f4b6a3</groupId>
             <artifactId>ulid-creator</artifactId>
-            <version>5.2.3</version>
+            <version>${ulid-creator.version}</version>
         </dependency>
 
     </dependencies>
