@@ -1,13 +1,17 @@
-﻿services:
+services:
   elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:8.15.1
-    container_name: elasticsearch
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.17.0
+    container_name: elasticsearch-for-edgar
     environment:
       - node.name=elasticsearch
       - discovery.type=single-node
       - cluster.name=docker-cluster
       - bootstrap.memory_lock=true
       - "ES_JAVA_OPTS=-Xms1g -Xmx1g"
+      - xpack.security.enabled=false
+#      - xpack.security.http.ssl.enabled=false
+#      - xpack.security.transport.ssl.enabled=false
+#      - ELASTIC_PASSWORD=password
     ulimits:
       memlock:
         soft: -1
@@ -20,20 +24,55 @@
       - efk
 
   kibana:
-    image: docker.elastic.co/kibana/kibana:8.15.1
-    container_name: kibana
+    image: docker.elastic.co/kibana/kibana:7.17.0
+    container_name: kibana-for-edgar
     environment:
       - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+#      - ELASTICSEARCH_USERNAME=elastic
+#      - ELASTICSEARCH_PASSWORD=password
+#      - xpack.security.enabled=true
+#      - xpack.security.encryptionKey="something_at_least_32_characters"
+#      - xpack.security.session.idleTimeout="24h"
     ports:
       - "5601:5601"
     depends_on:
       - elasticsearch
     networks:
       - efk
-
+  
+  logstash:
+    image: docker.elastic.co/logstash/logstash:7.17.0
+    container_name: logstash-for-edgar
+    volumes:
+      - ./monitoring/logstash/logstash.conf:/usr/share/logstash/pipeline/logstash.conf:ro
+    ports:
+      - "5000:5000"
+    depends_on:
+      - elasticsearch
+    
+  
+#  filebeat:
+#    image: elastic/filebeat:7.17.24
+#    container_name: filebeat-for-edgar
+#    command: [ "filebeat", "-e", "--strict.perms=false" ]
+#    volumes:
+#      - ./monitoring/filebeat/filebeat.yml:/usr/share/filebeat/filebeat.yml:ro
+#      # Mount the directory where your logs are stored
+#      - ./logs:/usr/share/filebeat/logs:ro
+#      # For internal container paths
+#      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+#      # Docker logs access
+#      - /var/run/docker.sock:/var/run/docker.sock
+#      - /var/log/syslog:/var/log/syslog:ro
+#    networks:
+#      - efk
+#    depends_on:
+#      - elasticsearch
+#      - kibana
+    
   prometheus:
     image: prom/prometheus:latest
-    container_name: prometheus
+    container_name: prometheus-for-edgar
     ports:
       - "9090:9090"
     volumes:
@@ -41,7 +80,7 @@
 
   grafana:
     image: grafana/grafana:latest
-    container_name: grafana
+    container_name: grafana-for-edgar
     ports:
       - "3000:3000"
     restart: unless-stopped
@@ -50,7 +89,7 @@
   
   zipkin:
     image: ghcr.io/openzipkin/zipkin-slim:latest
-    container_name: zipkin
+    container_name: zipkin-for-edgar
     environment:
       - STORAGE_TYPE=mem
     ports:
@@ -58,12 +97,12 @@
   
   minio:
     image: docker.io/bitnami/minio:latest
-    container_name: minio
+    container_name: minio-for-edgar
     ports:
       - '9000:9000'
       - '9001:9001'
     networks:
-      - minionetwork
+      - efk
     volumes:
       - 'minio_data:/data'
     environment:
@@ -72,8 +111,6 @@
       
 networks:
   efk:
-    driver: bridge
-  minionetwork:
     driver: bridge
 
 volumes:

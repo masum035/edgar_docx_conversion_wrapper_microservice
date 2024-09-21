@@ -12,6 +12,11 @@ springdoc:
     path: swagger-ui.html
     
 spring:
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 100MB
+      max-request-size: 100MB
   zipkin:
     base-url: http://localhost:9411/
   data:
@@ -19,9 +24,11 @@ spring:
       uri: mongodb+srv://masum-wsd:masum-wsd-db-password@mongo-cluster-of-masum.ba9aw.mongodb.net/
       database: journalDB
       auto-index-creation: true
+  elasticsearch:
+    cluster-nodes: http://localhost:9200
   main:
     allow-circular-references: true
-    
+
 # for actuator
 management:
   tracing:
@@ -41,14 +48,14 @@ management:
 minio:
   url: http://localhost:9000
   access:
-    key: nw3xUC6zDrPtCGojNZ2J
+    key: zyOCovqdafOFwy0IblHK
   secret:
-    key: 1HVXPTqPurYSoWcIyWyU91dNKbiNo04tHtiDgIR2
+    key: L8q8TyNg7AwvLLC3hkiXcdiqetlD8h0GWh8MV9yy
   bucket:
     name: edgar-bucket
 # for logging
 logging:
   level:
-    root: warn
+    root: info
     console:
-      level: WARN
+      level: info

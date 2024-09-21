@@ -1,4 +1,4 @@
-﻿FROM maven:latest as builder
+FROM maven:latest as builder
 LABEL version="0.0.1"
 LABEL description="This is my spring boot image for docx conversion"
 LABEL author="Md. Abdullah Al Masum"
