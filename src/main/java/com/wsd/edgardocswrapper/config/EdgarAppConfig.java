@@ -1,5 +1,7 @@
 package com.wsd.edgardocswrapper.config;
 
+import io.micrometer.observation.ObservationRegistry;
+import io.micrometer.observation.aop.ObservedAspect;
 import io.minio.MinioClient;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -23,11 +25,18 @@ public class EdgarAppConfig {
         return builder.build();
     }
 
+    // Bean for object storage with minio access
     @Bean
     public MinioClient minioClient() {
         return MinioClient.builder()
                 .endpoint(minioUrl)
                 .credentials(accessKey, secretKey)
                 .build();
+    }
+
+    // Bean for micrometer tracing and @Observed annotation
+    @Bean
+    ObservedAspect observedAspect(ObservationRegistry registry) {
+        return new ObservedAspect(registry);
     }
 }

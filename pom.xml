@@ -50,6 +50,7 @@
         <elastic-apm-agent.version>1.51.0</elastic-apm-agent.version>
         <micrometer-prometheus.version>1.13.4</micrometer-prometheus.version>
         <ulid-creator.version>5.2.3</ulid-creator.version>
+        <datasource-micrometer.version>1.0.5</datasource-micrometer.version>
     </properties>
     <dependencies>
         <dependency>
@@ -82,6 +83,10 @@
         </dependency>
         <!-- for distributed tracing -->
         <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-aop</artifactId>
+        </dependency>
+        <dependency>
             <groupId>io.micrometer</groupId>
             <artifactId>micrometer-tracing-bridge-brave</artifactId>
         </dependency>
@@ -89,6 +94,13 @@
             <groupId>io.zipkin.reporter2</groupId>
             <artifactId>zipkin-reporter-brave</artifactId>
         </dependency>
+        <!-- for JDBC tracing -->
+        <dependency>
+            <groupId>net.ttddyy.observation</groupId>
+            <artifactId>datasource-micrometer</artifactId>
+            <version>${datasource-micrometer.version}</version>
+        </dependency>
+
         <!-- for object storage -->
         <dependency>
             <groupId>io.minio</groupId>

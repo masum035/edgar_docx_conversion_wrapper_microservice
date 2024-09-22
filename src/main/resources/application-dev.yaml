@@ -31,6 +31,15 @@ spring:
 
 # for actuator
 management:
+  metrics:
+    distribution:
+      percentiles-histogram:
+        http:
+          server:
+            requests: true
+  observations:
+    key-values:
+      application: edgardocs-wrapper
   tracing:
     sampling:
       probability: 1.0
@@ -48,9 +57,9 @@ management:
 minio:
   url: http://localhost:9000
   access:
-    key: zyOCovqdafOFwy0IblHK
+    key: L0cB1po3VEvmSHIp5iym
   secret:
-    key: L8q8TyNg7AwvLLC3hkiXcdiqetlD8h0GWh8MV9yy
+    key: O6Bqc8lGFZblVXq1XsRGRT4tPNuMRiDpriYCP6wC
   bucket:
     name: edgar-bucket
 # for logging
