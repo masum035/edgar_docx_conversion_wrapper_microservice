@@ -12,6 +12,8 @@ springdoc:
     path: swagger-ui.html
     
 spring:
+  codec:
+    max-in-memory-size: 100M
   servlet:
     multipart:
       enabled: true
@@ -63,9 +65,9 @@ management:
 minio:
   url: http://localhost:9000
   access:
-    key: 2Xm4EeCNFNAUUiexpz8s
+    key: y2OarhGk9Czxh0nc7vEh
   secret:
-    key: dcgCMo4oiRpuBY8XWNfj36ATS3L7HtskXhC6Z0Ef
+    key: wlXExtE3uX18jZHrzt5AIovkvVzsHdxe0N0XJbVf
   bucket:
     name: edgar-bucket
 # for logging
