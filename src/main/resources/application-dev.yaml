@@ -28,6 +28,12 @@ spring:
     cluster-nodes: http://localhost:9200
   main:
     allow-circular-references: true
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8081/realms/testrealm
+          jwk-set-uri: ${spring.security.oauth2.resourceserver.jwt.issuer-uri}/protocol/openid-connect/certs
 
 # for actuator
 management:
@@ -57,9 +63,9 @@ management:
 minio:
   url: http://localhost:9000
   access:
-    key: L0cB1po3VEvmSHIp5iym
+    key: 2Xm4EeCNFNAUUiexpz8s
   secret:
-    key: O6Bqc8lGFZblVXq1XsRGRT4tPNuMRiDpriYCP6wC
+    key: dcgCMo4oiRpuBY8XWNfj36ATS3L7HtskXhC6Z0Ef
   bucket:
     name: edgar-bucket
 # for logging

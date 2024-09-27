@@ -50,9 +50,23 @@
         <elastic-apm-agent.version>1.51.0</elastic-apm-agent.version>
         <micrometer-prometheus.version>1.13.4</micrometer-prometheus.version>
         <ulid-creator.version>5.2.3</ulid-creator.version>
+        <oauth2-resource-server.version>6.3.3</oauth2-resource-server.version>
         <datasource-micrometer.version>1.0.5</datasource-micrometer.version>
+
+        <nexusUrlRelease>https://registry.production.solvians.com/repository/edgar-repository/</nexusUrlRelease>
     </properties>
+    <repositories>
+        <repository>
+            <id>something</id>
+            <url>${nexusUrlRelease}</url>
+        </repository>
+    </repositories>
     <dependencies>
+        <dependency>
+            <groupId>org.wsd.edgardocs</groupId>
+            <artifactId>docx</artifactId>
+            <version>1.0.4</version>
+        </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-actuator</artifactId>
@@ -60,10 +74,6 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-mongodb</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-security</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -149,6 +159,20 @@
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
         </dependency>
+        <!-- for security -->
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-oauth2-jose</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-oauth2-resource-server</artifactId>
+            <version>${oauth2-resource-server.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
+        </dependency>
         <!-- for tests -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -167,6 +191,13 @@
 
     </dependencies>
 
+    <distributionManagement>
+        <repository>
+            <id>edgar-docx-release</id>
+            <url>${nexusUrlRelease}</url>
+        </repository>
+    </distributionManagement>
+    
     <build>
         <plugins>
             <plugin>

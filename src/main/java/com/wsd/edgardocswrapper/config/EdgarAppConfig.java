@@ -6,6 +6,9 @@ import io.minio.MinioClient;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.task.AsyncTaskExecutor;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.reactive.function.client.WebClient;
 
 @Configuration
@@ -34,9 +37,26 @@ public class EdgarAppConfig {
                 .build();
     }
 
+    // Bean for restTemplate
+    @Bean
+    public RestTemplate restTemplate() {
+        return new RestTemplate();
+    }
     // Bean for micrometer tracing and @Observed annotation
     @Bean
     ObservedAspect observedAspect(ObservationRegistry registry) {
         return new ObservedAspect(registry);
+    }
+    
+    // Bean for ThreadPool
+    @Bean(name = "asyncExecutor")
+    public AsyncTaskExecutor asyncExecutor() {
+        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+        executor.setCorePoolSize(5); // Set your desired core pool size
+        executor.setMaxPoolSize(10); // Set your desired maximum pool size
+        executor.setQueueCapacity(100); // Set your desired queue capacity
+        executor.setThreadNamePrefix("AsyncThread-");
+        executor.initialize();
+        return executor;
     }
 }

@@ -1,5 +1,7 @@
 package com.wsd.edgardocswrapper.controllers;
 
+import com.github.f4b6a3.ulid.UlidCreator;
+import com.wsd.edgardocswrapper.dto.requestsDTO.FileUploadRequestDTO;
 import com.wsd.edgardocswrapper.services.IDocxPreprocessingService;
 import com.wsd.edgardocswrapper.services.IFileUploadService;
 import com.wsd.edgardocswrapper.services.IMinioService;
@@ -9,17 +11,14 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
 
 @RequiredArgsConstructor
 @RestController
@@ -42,18 +41,18 @@ public class DocxController {
     @PostMapping("/upload2")
     public Mono<ResponseEntity<String>> uploadFile(@RequestParam("file") MultipartFile file) {
         return fileUploadService.uploadAndProcessFile(file)
-                .then(minioService.uploadFile("original-files",file))
+                .then(minioService.uploadFile("original-files", file))
                 .then(Mono.just(ResponseEntity.ok("File uploaded, processed, and stored in MinIO successfully.")))
                 .onErrorResume(error -> {
                     return Mono.just(ResponseEntity.status(500).body("An error occurred: " + error.getMessage()));
                 });
     }
-    
+
     @PostMapping("/upload")
     public ResponseEntity<ApiResponseDTO<?>> handleFileUpload(@RequestParam("file") MultipartFile file, HttpServletRequest request) {
         ApiResponseDTO<?> responseDTO;
         try {
-            minioService.uploadFile("original-files",file);
+            minioService.uploadFile("original-files", file);
 //            System.out.println(fileUrl);
             docxPreprocessingService.downloadFileWithNoParams(file);
             responseDTO = ApiResponseUtil.success(null, "success", request.getRequestURI());
@@ -64,21 +63,39 @@ public class DocxController {
         }
     }
 
-    public File convertMultipartFileToFile(MultipartFile multipartFile) throws IOException {
-        // Create a temporary file
-        File file = File.createTempFile("temp", multipartFile.getOriginalFilename());
-
-        try (InputStream inputStream = multipartFile.getInputStream();
-             FileOutputStream outputStream = new FileOutputStream(file)) {
-            int read;
-            byte[] bytes = new byte[1024];
-
-            while ((read = inputStream.read(bytes)) != -1) {
-                outputStream.write(bytes, 0, read);
+    //    @PostMapping(value = "/convert", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+    @PostMapping(value = "/convert")
+    public ResponseEntity<ApiResponseDTO<?>> conversionService(
+            @RequestBody FileUploadRequestDTO requestDAO,
+            @RequestPart("file") MultipartFile file,
+            HttpServletRequest httpServletRequest) {
+        ApiResponseDTO<?> responseDTO;
+        HttpHeaders httpHeaders = new HttpHeaders();
+        try {
+            if (requestDAO.getZipFileName().isEmpty()) {
+                requestDAO.setZipFileName("EdgarDefault.zip");
             }
-        }
+            requestDAO.setZipFileName(UlidCreator.getMonotonicUlid().toString() + "-" + requestDAO.getZipFileName());
+            if (!requestDAO.getZipFileName().endsWith(".zip")) {
+                requestDAO.setZipFileName(requestDAO.getZipFileName() + ".zip");
+            }
 
-        return file;
+            httpHeaders.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+            httpHeaders.setContentDispositionFormData("attachment", requestDAO.getZipFileName());
+            // logic goes here
+            minioService.uploadFile("original-files", file);
+            
+            // return statement
+            logger.info("converted successfully.");
+            responseDTO = ApiResponseUtil.success(requestDAO, "success", httpServletRequest.getRequestURI());
+            logger.info("converted successfully-2" + requestDAO.getZipFileName());
+        } catch (Exception ex) {
+            logger.error("conversion didn't happen");
+            responseDTO = ApiResponseUtil.error(ex.getLocalizedMessage(), ex.getMessage(), 1001, httpServletRequest.getRequestURI());
+
+        }
+//        return new ResponseEntity<>(responseDTO, httpHeaders, HttpStatus.OK);
+        return new ResponseEntity<>(responseDTO, HttpStatus.OK);
     }
 }
 
