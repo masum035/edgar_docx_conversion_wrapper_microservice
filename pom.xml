@@ -55,12 +55,12 @@
 
         <nexusUrlRelease>https://registry.production.solvians.com/repository/edgar-repository/</nexusUrlRelease>
     </properties>
-    <repositories>
-        <repository>
-            <id>something</id>
-            <url>${nexusUrlRelease}</url>
-        </repository>
-    </repositories>
+<!--    <repositories>-->
+<!--        <repository>-->
+<!--            <id>something</id>-->
+<!--            <url>${nexusUrlRelease}</url>-->
+<!--        </repository>-->
+<!--    </repositories>-->
     <dependencies>
         <dependency>
             <groupId>org.wsd.edgardocs</groupId>
@@ -197,12 +197,12 @@
 
     </dependencies>
 
-    <distributionManagement>
-        <repository>
-            <id>edgar-docx-release</id>
-            <url>${nexusUrlRelease}</url>
-        </repository>
-    </distributionManagement>
+<!--    <distributionManagement>-->
+<!--        <repository>-->
+<!--            <id>edgar-docx-release</id>-->
+<!--            <url>${nexusUrlRelease}</url>-->
+<!--        </repository>-->
+<!--    </distributionManagement>-->
     
     <build>
         <plugins>
