@@ -1,75 +1,7 @@
-services:
-#  elasticsearch:
-#    image: docker.elastic.co/elasticsearch/elasticsearch:7.17.0
-#    container_name: elasticsearch
-#    environment:
-#      - node.name=elasticsearch
-#      - discovery.type=single-node
-#      - cluster.name=docker-cluster
-#      - bootstrap.memory_lock=true
-#      - "ES_JAVA_OPTS=-Xms1g -Xmx1g"
-#      - xpack.security.enabled=false
-##      - xpack.security.http.ssl.enabled=false
-##      - xpack.security.transport.ssl.enabled=false
-##      - ELASTIC_PASSWORD=password
-#    ulimits:
-#      memlock:
-#        soft: -1
-#        hard: -1
-#    ports:
-#      - "9200:9200"
-#    volumes:
-#      - es_data:/usr/share/elasticsearch/data
-#    networks:
-#      - efk
+# Created by: Abdullah Al Masum
+# Description: everything should be dockerized
 
-#  kibana:
-#    image: docker.elastic.co/kibana/kibana:7.17.0
-#    container_name: kibana
-#    environment:
-#      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
-##      - ELASTICSEARCH_USERNAME=elastic
-##      - ELASTICSEARCH_PASSWORD=password
-##      - xpack.security.enabled=true
-##      - xpack.security.encryptionKey="something_at_least_32_characters"
-##      - xpack.security.session.idleTimeout="24h"
-#    ports:
-#      - "5601:5601"
-#    depends_on:
-#      - elasticsearch
-#    networks:
-#      - efk
-#  
-#  logstash:
-#    image: docker.elastic.co/logstash/logstash:7.17.0
-#    container_name: logstash
-#    volumes:
-#      - ./monitoring/logstash/logstash.conf:/usr/share/logstash/pipeline/logstash.conf:ro
-#    ports:
-#      - "5000:5000"
-#    depends_on:
-#      - elasticsearch
-    
-  
-#  filebeat:
-#    image: elastic/filebeat:7.17.24
-#    container_name: filebeat
-#    command: [ "filebeat", "-e", "--strict.perms=false" ]
-#    volumes:
-#      - ./monitoring/filebeat/filebeat.yml:/usr/share/filebeat/filebeat.yml:ro
-#      # Mount the directory where your logs are stored
-#      - ./logs:/usr/share/filebeat/logs:ro
-#      # For internal container paths
-#      - /var/lib/docker/containers:/var/lib/docker/containers:ro
-#      # Docker logs access
-#      - /var/run/docker.sock:/var/run/docker.sock
-#      - /var/log/syslog:/var/log/syslog:ro
-#    networks:
-#      - efk
-#    depends_on:
-#      - elasticsearch
-#      - kibana
-    
+services:
   prometheus:
     image: prom/prometheus:latest
     container_name: prometheus
@@ -77,90 +9,80 @@ services:
       - --enable-feature=exemplar-storage
       - --config.file=/etc/prometheus/prometheus.yml
     ports:
-      - "9090:9090"
-#    networks:
-#      - grafana
+      - "${PROMETHEUS_PORT}:9090"
+    networks:
+      - grafana
     volumes:
-      - ./monitoring/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - "${PROMETHEUS_DATA}:/etc/prometheus/prometheus.yml"
 
   grafana:
     image: grafana/grafana:latest
     container_name: grafana
     ports:
-      - "3000:3000"
-#    restart: unless-stopped
+      - "${GRAFANA_PORT}:3000"
+    #    restart: unless-stopped
     depends_on:
       - prometheus
     environment:
       - GF_AUTH_ANONYMOUS_ENABLED=true
       - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
       - GF_AUTH_DISABLE_LOGIN_FORM=true
-#    networks:
-#      - grafana
+    networks:
+      - grafana
     volumes:
-      - ./monitoring/grafana/provisioning/datasources:/etc/grafana/provisioning/datasources
-        
+      - "${GRAFANA_DATA}:/etc/grafana/provisioning/datasources"
+  
   loki:
     image: grafana/loki:latest
     container_name: loki
     ports:
-      - "3100:3100"
+      - "${LOKI_PORT}:3100"
     command: ['-config.file=/etc/loki/local-config.yaml']
-#    restart: unless-stopped
-#    networks:
-#      - grafana
-  
-#  zipkin:
-#    image: ghcr.io/openzipkin/zipkin-slim:latest
-#    container_name: zipkin
-#    environment:
-#      - STORAGE_TYPE=mem
-#    ports:
-#      - "9411:9411"
+    #    restart: unless-stopped
+    networks:
+      - grafana
   
   tempo:
     image: grafana/tempo:latest
     container_name: tempo
     command: [ '-config.file=/etc/tempo.yaml' ]
     volumes:
-      - ./monitoring/tempo/tempo.yml:/etc/tempo.yaml:ro
-      - ./monitoring/tempo/tempo-data:/tmp/tempo
+      - "${TEMPO_CONFIG}:/etc/tempo.yaml:ro"
+      - "${TEMPO_DATA}:/tmp/tempo"
     ports:
-      - '3200:3200' # Tempo
-      - '9411:9411' # zipkin
-#    networks:
-#      - grafana
+      - '${TEMPO_PORT}:3200' # Tempo
+      - '${TEMPO_ZIPKIN_PORT}:9411' # Zipkin
+    networks:
+      - grafana
 
   minio:
     image: docker.io/bitnami/minio:latest
     container_name: minio
     ports:
-      - '9000:9000'
-      - '9001:9001'
-#    networks:
-#      - efk
+      - '${MINIO_PORT}:9000'
+      - '${MINIO_CONSOLE_PORT}:9001'
     volumes:
-      - ./docker/minio/data/:/data
+      - "${MINIO_DATA}:/data"
     environment:
-      - MINIO_ROOT_USER=admin
-      - MINIO_ROOT_PASSWORD=password
+      - MINIO_ROOT_USER=${MINIO_ROOT_USER}
+      - MINIO_ROOT_PASSWORD=${MINIO_ROOT_PASSWORD}
   
   keycloak:
     image: bitnami/keycloak:latest
     container_name: bitnami_keycloak
     environment:
-      KEYCLOAK_ADMIN: masum
-      KEYCLOAK_ADMIN_PASSWORD: masum
-      KEYCLOAK_USER: masum
-      KEYCLOAK_PASSWORD: masum
-      DB_VENDOR: postgres
-      DB_ADDR: keycloak-db
-      DB_PORT: 5432
-      DB_DATABASE: keycloak
-      DB_USER: keycloak
-      DB_PASSWORD: keycloak
+      KEYCLOAK_ADMIN: ${KEYCLOAK_ADMIN_USER}
+      KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD}
+      KEYCLOAK_USER: ${KEYCLOAK_USER}
+      KEYCLOAK_PASSWORD: ${KEYCLOAK_PASSWORD}
+      DB_VENDOR: ${KEYCLOAK_DB_VENDOR}
+      DB_ADDR: ${KEYCLOAK_DB_HOST}
+      DB_PORT: ${KEYCLOAK_DB_PORT}
+      DB_DATABASE: ${KEYCLOAK_DB_NAME}
+      DB_USER: ${KEYCLOAK_DB_USER}
+      DB_PASSWORD: ${KEYCLOAK_DB_PASSWORD}
     ports:
-      - "8081:8080"
+      - "${KEYCLOAK_PORT}:8080"
     networks:
       - backend
     depends_on:
@@ -170,23 +92,29 @@ services:
     image: postgres:latest
     container_name: keycloak_db
     environment:
-      POSTGRES_DB: keycloak
-      POSTGRES_USER: keycloak
-      POSTGRES_PASSWORD: keycloak
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - "${POSTGRES_PORT}:5432"
     networks:
       - backend
-      
+  
+  sonarqube:
+    image: sonarqube:latest
+    container_name: sonarqube
+    ports:
+      - "${SONARQUBE_PORT}:9000"
+    networks:
+      - backend
+    volumes:
+      - "${SONARQUBE_CONFIG}:/opt/sonarqube/conf"
+      - "${SONARQUBE_DATA}:/opt/sonarqube/data"
+      - "${SONARQUBE_EXTENSIONS}:/opt/sonarqube/extensions"
+      - "${SONARQUBE_PLUGINS}:/opt/sonarqube/lib/bundled-plugins"
+
 networks:
-#  efk:
-#    driver: bridge
   backend:
   grafana:
     driver: bridge
 
-#volumes:
-#  postgresql_data:
-#    driver: local
-##  es_data:
-##    driver: local
-#  minio_data:
-#    driver: local
