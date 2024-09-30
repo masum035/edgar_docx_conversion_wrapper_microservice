@@ -1,0 +1,71 @@
+﻿name: Run JMeter Tests
+
+on:
+  push:
+    branches: ["dev"]
+  pull_request:
+    branches: ["dev"]
+
+jobs:
+  jmeter-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Checkout the code
+      - name: Checkout code
+        uses: actions/checkout@v3
+      
+      # Step 2: Set up Java
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'corretto'
+          java-version: '17' 
+      
+      # Step 3: Set up Maven
+      - name: Set up Maven
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'maven'
+          java-version: '17' 
+      
+      # Step 4: Build the Spring Boot app (optional if you want to run the app)
+      - name: Build Spring Boot app
+        run: mvn clean install
+      
+      # Step 5: Run the Spring Boot app in the background (optional, only if needed for the JMeter tests)
+      - name: Start Spring Boot app
+        run: nohup mvn spring-boot:run &
+      
+      # Step 6: Run JMeter tests
+      - name: Run JMeter tests
+        run: mvn verify -Pjmeter -Djmeter.save.saveservice.output_format=xml
+        env:
+          JMETER_HOME: /path/to/jmeter  # Update if needed
+      
+      # Step 7: Parse JMeter results and check score (Using a Bash Script or Maven Plugin)
+      - name: Check JMeter test results
+        id: jmeter-check
+        run: |
+          totalRequests=$(grep -c "<httpSample" target/jmeter/results/*/*.xml)
+          passedRequests=$(grep -c "s=\"true\"" target/jmeter/results/*/*.xml)
+          passPercentage=$(( 100 * passedRequests / totalRequests ))
+          echo "JMeter pass percentage: $passPercentage"
+          echo "::set-output name=pass-percentage::$passPercentage"
+      
+      # Step 8: Fail the job if JMeter pass percentage is less than 80%
+      - name: Ensure JMeter score is above 80%
+        run: |
+          if [ "${{ steps.jmeter-check.outputs.pass-percentage }}" -lt 80 ]; then
+            echo "JMeter pass percentage is below 80%, failing the job."
+            exit 1
+          else
+            echo "JMeter pass percentage is above 80%, passing the job."
+          fi
+      
+      # Step 9: Upload JMeter results as artifacts
+      - name: Upload JMeter Test Results
+        uses: actions/upload-artifact@v3
+        with:
+          name: jmeter-results
+          path: target/jmeter/results

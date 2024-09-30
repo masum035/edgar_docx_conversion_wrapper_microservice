@@ -12,7 +12,7 @@
     <artifactId>edgardocs-wrapper</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>edgardocs-wrapper</name>
-    <description>edgardocs-wrapper</description>
+    <description>Microservice for EDGAR-2.0 </description>
     <url/>
     <licenses>
         <license/>
@@ -55,18 +55,8 @@
 
         <nexusUrlRelease>https://registry.production.solvians.com/repository/edgar-repository/</nexusUrlRelease>
     </properties>
-<!--    <repositories>-->
-<!--        <repository>-->
-<!--            <id>something</id>-->
-<!--            <url>${nexusUrlRelease}</url>-->
-<!--        </repository>-->
-<!--    </repositories>-->
+
     <dependencies>
-        <dependency>
-            <groupId>org.wsd.edgardocs</groupId>
-            <artifactId>docx</artifactId>
-            <version>1.0.4</version>
-        </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-actuator</artifactId>
@@ -173,12 +163,6 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-security</artifactId>
         </dependency>
-        <!-- for monitoring -->
-        <dependency>
-            <groupId>io.sentry</groupId>
-            <artifactId>sentry-spring-boot-starter-jakarta</artifactId>
-            <version>7.14.0</version>
-        </dependency>
         <!-- for tests -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -196,16 +180,10 @@
         </dependency>
 
     </dependencies>
-
-<!--    <distributionManagement>-->
-<!--        <repository>-->
-<!--            <id>edgar-docx-release</id>-->
-<!--            <url>${nexusUrlRelease}</url>-->
-<!--        </repository>-->
-<!--    </distributionManagement>-->
     
     <build>
         <plugins>
+            <!-- Spring Boot Maven Plugin -->
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
@@ -218,7 +196,63 @@
                     </excludes>
                 </configuration>
             </plugin>
+            <!-- JMeter Maven Plugin -->
+            <plugin>
+                <groupId>com.lazerycode.jmeter</groupId>
+                <artifactId>jmeter-maven-plugin</artifactId>
+                <version>3.8.0</version>
+                <executions>
+                    <execution>
+                        <id>configuration</id>
+                        <goals>
+                            <goal>configure</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>jmeter-tests</id>
+                        <goals>
+                            <goal>jmeter</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <testFilesDirectory>src/test/jmeter</testFilesDirectory>
+                    <resultsFileFormat>xml</resultsFileFormat>
+                    <resultsDirectory>target/jmeter/results</resultsDirectory>
+                    <generateReports>true</generateReports>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
+
+    <!-- To run jmeter tests: mvn verify -Pjmeter,run-app --> 
+    <profiles>
+        <!-- JMeter Test Profile -->
+        
+        <profile>
+            <id>jmeter</id>
+            <build>
+                <plugins>
+                    <!-- Configure JMeter execution for this profile -->
+                    <plugin>
+                        <groupId>com.lazerycode.jmeter</groupId>
+                        <artifactId>jmeter-maven-plugin</artifactId>
+                        <version>3.8.0</version>
+                        <executions>
+                            <execution>
+                                <id>jmeter-tests</id>
+                                <goals>
+                                    <goal>jmeter</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <testFilesDirectory>src/test/jmeter</testFilesDirectory>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 
 </project>

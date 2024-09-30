@@ -76,21 +76,3 @@ logging:
     root: info
     console:
       level: info
-      
-sentry:
-  dsn: https://7207c6cdf49550a43ffc89d4fcc5557c@o4508031348113408.ingest.us.sentry.io/4508031351717888
-  send-default-pii: true
-  max-request-body-size: medium
-# Sentry Spring Boot integration allows more fine-grained SentryOptions configuration
-  max-breadcrumbs: 150
-# Logback integration configuration options
-  logging.minimum-event-level: info
-  logging.minimum-breadcrumb-level: debug
-# Performance configuration
-  traces-sample-rate: 1.0
-  enable-tracing: true
-  ignored-checkins: ignored_monitor_slug_1,ignored_monitor_slug_2
-  debug: true
-  enable-backpressure-handling: true
-  enable-spotlight: true
-  enable-metrics: true
