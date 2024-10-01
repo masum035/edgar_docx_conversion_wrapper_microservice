@@ -44,6 +44,8 @@
         <docker-image-tag>latest</docker-image-tag>
 
         <minio.version>8.5.12</minio.version>
+        <keycloak-admin-client.version>25.0.6</keycloak-admin-client.version>
+        <jakarta.ws.rs-api.version>3.1.0</jakarta.ws.rs-api.version>
         <springdoc.version>2.6.0</springdoc.version>
         <logstash-logback-encoder.version>7.4</logstash-logback-encoder.version>
         <loki-logback-appender.version>1.5.1</loki-logback-appender.version>
@@ -162,6 +164,16 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-security</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.keycloak</groupId>
+            <artifactId>keycloak-admin-client</artifactId>
+            <version>${keycloak-admin-client.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>jakarta.ws.rs</groupId>
+            <artifactId>jakarta.ws.rs-api</artifactId>
+            <version>${jakarta.ws.rs-api.version}</version>
         </dependency>
         <!-- for tests -->
         <dependency>
