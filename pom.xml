@@ -9,10 +9,10 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.wsd</groupId>
-    <artifactId>edgardocs-wrapper</artifactId>
+    <artifactId>EDGAR-2-Point-O-Trailer-1</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>edgardocs-wrapper</name>
-    <description>Microservice for EDGAR-2.0 </description>
+    <name>EDGAR-2.0 Trailer-1</name>
+    <description>Just Another Microservice for EDGAR-2.0 </description>
     <url/>
     <licenses>
         <license/>
@@ -40,7 +40,7 @@
         <java.version>17</java.version>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
-        <docker-image-name>edgardocs-wrapper</docker-image-name>
+        <docker-image-name>docx_conversion_wrapper</docker-image-name>
         <docker-image-tag>latest</docker-image-tag>
 
         <minio.version>8.5.12</minio.version>

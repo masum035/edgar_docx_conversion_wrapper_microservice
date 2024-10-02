@@ -3,8 +3,8 @@
 
 services:
   app:
-    image: edgar_wrapper:latest
-    container_name: edgar_wrapper_app
+    image: docx_conversion_wrapper:latest
+    container_name: docx_conversion_wrapper_app
     ports:
       - "${APPLICATION_PORT}:8080"   # Expose port 8080 for the Spring Boot application
     networks:
@@ -23,7 +23,7 @@ services:
   
   jmeter:
     image: justb4/jmeter:latest
-    container_name: jmeter-test
+    container_name: jmeter_test
     depends_on:
       - app
     volumes:

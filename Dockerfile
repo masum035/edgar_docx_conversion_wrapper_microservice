@@ -15,6 +15,6 @@ RUN mvn clean install package -DskipTests=true
 
 FROM openjdk:17-jdk-slim as prod
 WORKDIR /app
-COPY --from=builder /app/target/edgardocs-wrapper-0.0.1-SNAPSHOT.jar /app/edgardocs-wrapper.jar
+COPY --from=builder /app/target/EDGAR-2-Point-O-Trailer-1-0.0.1-SNAPSHOT.jar /app/docx_conversion_wrapper.jar
 EXPOSE ${APPLICATION_PORT}
-ENTRYPOINT ["java","-jar","/app/edgardocs-wrapper.jar"]
+ENTRYPOINT ["java","-jar","/app/docx_conversion_wrapper.jar"]

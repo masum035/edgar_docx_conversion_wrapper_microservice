@@ -162,6 +162,27 @@ build/
 ### VS Code ###
 .vscode/
 
+### Docker Section (Project Specific) ###
+/docker/postgresql/data/*
+!/docker/postgresql/data/.gitkeep
+/docker/minio/data/*
+!/docker/minio/data/.gitkeep
+/docker/keycloak/data/*
+!/docker/keycloak/data/.gitkeep
+
+### Monitoring Section (Project Specific) ###
+/monitoring/sonarqube/sonarqube_bundled_plugins/*
+!/monitoring/sonarqube/sonarqube_bundled_plugins/.gitkeep
+/monitoring/sonarqube/sonarqube_conf/*
+!/monitoring/sonarqube/sonarqube_conf/.gitkeep
+/monitoring/sonarqube/sonarqube_data/*
+!/monitoring/sonarqube/sonarqube_data/.gitkeep
+/monitoring/sonarqube/sonarqube_extensions/*
+!/monitoring/sonarqube/sonarqube_extensions/.gitkeep
+
+/monitoring/tempo/tempo-data/*
+!/monitoring/tempo/tempo-data/.gitkeep
+
 ### Some additional ignores (sort later)
 *.DS_Store
 *.sw?
